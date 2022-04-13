@@ -1,12 +1,51 @@
-type Item = {
+type TextInput = {
   name: string;
-  tagName: string;
-  type?: string;
+  tagName: "input";
+  type: "text" | "email" | "tel";
   label: string;
-  placeholder?: string;
-  values?: { label: string; value: number }[];
-  options?: { text: string; value: number }[];
-};
+  placeholder: string;
+}
+
+type RadioInput = {
+  name: string;
+  label: string;
+  tagName: "input";
+  type: "radio";
+  values: {
+    label: string;
+    value: number;
+  }[]
+}
+
+type CheckboxInput = {
+  name: string;
+  label: string;
+  tagName: "input";
+  type: "checkbox";
+  values: {
+    label: string;
+    value: number;
+  }[]
+}
+
+type SelectInput = {
+  name: string;
+  label: string;
+  tagName: "select";
+  options: {
+    text: string;
+    value: number;
+  }[]
+}
+
+type TextAreaInput = {
+  name: string;
+  placeholder: string;
+  label: string;
+  tagName: "textarea";
+}
+
+type Item = TextInput | RadioInput | CheckboxInput | SelectInput | TextAreaInput
 
 const items: Item[] = [
   {
@@ -80,24 +119,38 @@ const items: Item[] = [
 // _____________________________________________________________________________
 //
 
-function createInputRow(item: Item) {
+function createInputRow(item: TextInput) {
   return `
     <tr>
       <th>
         <label for="${item.name}">${item.label}</label>
       </th>
       <td>
-        ${item.values ?
-        item.values.map((value, index) => 
-        `<input id="${item.name + index}" name="${item.name}" type="${item.type}" ><label for="${item.name + index}">${value.label}</label>`).join('')
-        : `<input id="${item.name}" name="${item.name}" type="${item.type}" placeholder="${item.placeholder}"/>`
+        <input id="${item.name}" name="${item.name}" type="${item.type}" placeholder="${item.placeholder}"/>
+      </td>
+    </tr>
+  `;
+}
+
+function createMultipleInputsRow(item: RadioInput | CheckboxInput) {
+  return `
+    <tr>
+      <th>
+        <label for="${item.name}">${item.label}</label>
+      </th>
+      <td>
+        ${
+          item.values
+          .map((value, index) => 
+            `<input id="${item.name + index}" name="${item.name}" type="${item.type}" ><label for="${item.name + index}">${value.label}</label>`)
+          .join('')
         }
       </td>
     </tr>
   `;
 }
 
-function createSelectRow(item: Item) {
+function createSelectRow(item: SelectInput) {
   return `
     <tr>
       <th>
@@ -114,7 +167,7 @@ function createSelectRow(item: Item) {
   `;
 }
 
-function createTextAreaRow(item: Item) {
+function createTextAreaRow(item: TextAreaInput) {
   return `
     <tr>
       <th>
@@ -131,8 +184,15 @@ function createTable() {
   const list = items
     .map((item) => {
       switch (item.tagName) {
-        case "input":
-          return createInputRow(item);
+        case "input": {
+          switch(item.type) {
+            case "radio":
+            case "checkbox":
+              return createMultipleInputsRow(item);
+            default:
+              return createInputRow(item)
+          }
+        }
         case "select":
           return createSelectRow(item);
         case "textarea":
