@@ -84,9 +84,14 @@ function createInputRow(item: Item) {
   return `
     <tr>
       <th>
+        <label for="${item.name}">${item.label}</label>
       </th>
       <td>
-        <input />
+        ${item.values ?
+        item.values.map((value, index) => 
+        `<input id="${item.name + index}" name="${item.name}" type="${item.type}" ><label for="${item.name + index}">${value.label}</label>`).join('')
+        : `<input id="${item.name}" name="${item.name}" type="${item.type}" placeholder="${item.placeholder}"/>`
+        }
       </td>
     </tr>
   `;
@@ -96,9 +101,13 @@ function createSelectRow(item: Item) {
   return `
     <tr>
       <th>
+        <label for="${item.name}">${item.label}</label>
       </th>
       <td>
-        <select>
+        <select id="${item.name}" name="${item.name}">
+          ${item.options?.map(option => `
+            <option value="${option.value}">${option.text}</option>
+          `).join('')}
         </select>
       </td>
     </tr>
@@ -109,9 +118,10 @@ function createTextAreaRow(item: Item) {
   return `
     <tr>
       <th>
+        <label for="${item.name}">${item.label}</label>
       </th>
       <td>
-        <textarea></textarea>
+        <textarea id="${item.name}" name="${item.name}" placeholder="${item.placeholder}"></textarea>
       </td>
     </tr>
   `;
@@ -134,7 +144,7 @@ function createTable() {
 }
 
 function createFormDom() {
-  const form = document.getElementById("form");
+  const form = document.getElementById("form")!;
   form.innerHTML = createTable();
 }
 
