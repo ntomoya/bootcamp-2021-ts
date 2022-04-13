@@ -204,8 +204,10 @@ function createTable() {
 }
 
 function createFormDom() {
-  const form = document.getElementById("form")!;
-  form.innerHTML = createTable();
+  const form = document.getElementById("form");
+  if (form !== null) {
+    form.innerHTML = createTable();
+  }
 }
 
 createFormDom();
